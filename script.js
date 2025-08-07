@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const mappedTasks = tasks.map(normalizeTask);
 
         if (favorites && favorites.trim() !== '') {
-            const subject = encodeURIComponent('Favorite Gen AI Prompt Submission');
+            const subject = encodeURIComponent('Favorite Gen AI Prompts Submission');
             const body = encodeURIComponent(
                 'AI Familiarity: ' + (familiarity || '') + '\n' +
                 'Selected Tasks: ' + (tasks.join || '') + '\n' +
