@@ -15,36 +15,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     const progressBarEl = document.querySelector('.progress-bar');
     const navigationEl = document.querySelector('.navigation');
 
-    // Hide the form, progress bar, and navigation on initial load; the form is
-    // already hidden via inline style in index.html. We still hide the
-    // progress bar and navigation until the user clicks the start button.
     if (progressBarEl) progressBarEl.style.display = 'none';
     if (navigationEl) navigationEl.style.display = 'none';
 
-    // When the user clicks the start button, hide the cover page and
-    // reveal the survey form along with the progress bar and navigation. The
-    // first survey step will then be displayed.
     if (startBtn) {
         startBtn.addEventListener('click', () => {
             if (coverPage) coverPage.style.display = 'none';
             form.style.display = 'block';
             if (progressBarEl) progressBarEl.style.display = 'block';
             if (navigationEl) navigationEl.style.display = 'flex';
-            // Reset current step to 0 in case the user restarted
             currentStep = 0;
             showStep(currentStep);
         });
     }
 
-    // Mapping user familiarity to prompt levels
-    const familiarityMapping = {
-        High: 'Advanced',
-        Medium: 'Enhanced',
-        Low: 'Basic'
-    };
-
-    // Escape HTML special characters to preserve placeholders like
-    // <Company> and <Year> when generating downloadable documents.
     function escapeHtml(text) {
         if (!text) return '';
         return text
@@ -53,76 +37,53 @@ document.addEventListener('DOMContentLoaded', async () => {
             .replace(/>/g, '&gt;');
     }
 
-    // Normalize task names to match dataset
     function normalizeTask(task) {
         if (!task) return task;
-        // Map brainstorming/ideation to Brainstorm
         if (task.trim().toLowerCase().startsWith('brainstorm')) {
             return 'Brainstorm';
         }
-        // Map drafting & writing tasks
         if (task.trim().toLowerCase().startsWith('drafting')) {
             return 'Drafting & Writing';
         }
-        // All other tasks match exactly as provided in dataset
         return task;
     }
 
-    // Show the appropriate step and update progress bar
     function showStep(index) {
         steps.forEach((step, i) => {
             step.style.display = i === index ? 'block' : 'none';
         });
-        // Update progress: index ranges 0‑7; last index is results step calculation
-        const totalSteps = steps.length - 1; // exclude results for progress calculation
+        const totalSteps = steps.length - 1;
         const ratio = index / totalSteps;
         progress.style.width = `${Math.min(ratio * 100, 100)}%`;
-        // Update navigation buttons
-        if (index === 0) {
-            prevBtn.style.display = 'none';
-        } else {
-            prevBtn.style.display = 'inline-block';
-        }
+
+        prevBtn.style.display = index === 0 ? 'none' : 'inline-block';
+
         if (index === steps.length - 1) {
-            // results step – hide navigation completely
             document.querySelector('.navigation').style.display = 'none';
         } else {
             document.querySelector('.navigation').style.display = 'flex';
-            if (index === steps.length - 2) {
-                nextBtn.textContent = 'Submit';
-            } else {
-                nextBtn.textContent = 'Next';
-            }
+            nextBtn.textContent = index === steps.length - 2 ? 'Submit' : 'Next';
         }
     }
 
-    // Process form and filter prompts
     function processForm() {
-        // Validate the form before processing
         if (!form.checkValidity()) {
             form.reportValidity();
             return;
         }
+
         const formData = new FormData(form);
         const name = formData.get('name');
         const email = formData.get('email');
         const level = formData.get('level');
-        // The offering question is single‑select, so retrieve a single value
         const offering = formData.get('offering');
-        // Normalize to an array for filtering logic
         const offerings = offering ? [offering] : [];
         const tasks = formData.getAll('tasks');
         const familiarity = formData.get('familiarity');
         const favorites = formData.get('favorites');
-        // Derive prompt level from familiarity
-        const promptLevel = familiarityMapping[familiarity] || 'Basic';
-        // Normalize tasks to dataset categories
+        const promptLevel = familiarity; // Direct match to "Prompt Level"
         const mappedTasks = tasks.map(normalizeTask);
 
-        // If the respondent provided a favorite prompt, open a mailto link pre‑filled with their details.
-        // Web3Forms submission has been removed in favour of a simple mailto link. This will open the
-        // user's default mail client (e.g. Outlook) with the subject and body prepopulated so they can
-        // click send to share their favourite prompt.
         if (favorites && favorites.trim() !== '') {
             const subject = encodeURIComponent('Favorite Gen AI Prompt Submission');
             const body = encodeURIComponent(
@@ -131,23 +92,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                 'Favourite Prompt: ' + favorites.trim()
             );
             const mailtoUrl = 'mailto:dkrasemann@deloitte.com?subject=' + subject + '&body=' + body;
-            // Use window.location rather than window.open for better compatibility with email clients
             window.location.href = mailtoUrl;
         }
 
-        // Filter prompts
         const filtered = promptsData.filter(item => {
-            // Offering must match one of selected offerings
             if (!offerings.includes(item['S&T Offering'])) return false;
-            // Task category must match one of selected (after normalization)
             if (!mappedTasks.includes(item['Task Category'])) return false;
-            // Prompt level must match derived level
             if (item['Prompt Level'] !== promptLevel) return false;
-            // Recommended level must match user's level exactly
             if (item['Recommended Level'] !== level) return false;
             return true;
         });
-        // Group prompts by task category and deduplicate prompt texts
+
         const grouped = {};
         filtered.forEach(item => {
             const category = item['Task Category'];
@@ -156,10 +111,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             grouped[category].add(item['Prompt']);
         });
-        // Populate results container with user responses and grouped prompts
+
         const resultsContainer = document.getElementById('results-container');
         resultsContainer.innerHTML = '';
-        // Always show the user's responses
+
         const userInfo = document.createElement('div');
         userInfo.classList.add('user-info');
         userInfo.innerHTML = `
@@ -172,20 +127,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         `;
         resultsContainer.appendChild(userInfo);
 
-        // Summary sentence describing level and offering
         const summary = document.createElement('p');
         summary.classList.add('summary');
-        // Capitalize fixed words "Level" and "Offering" in the summary sentence
         summary.textContent = `Respondents who are at ${level} Level from ${offering} Offering benefit from the following prompts:`;
         resultsContainer.appendChild(summary);
 
-        // If no prompts matched, display a message
         if (Object.keys(grouped).length === 0) {
             const noPromptsMsg = document.createElement('p');
             noPromptsMsg.textContent = 'No prompts matched your selections. Try broadening your options.';
             resultsContainer.appendChild(noPromptsMsg);
         } else {
-            // Sort categories alphabetically for consistent ordering
             const sortedCategories = Object.keys(grouped).sort();
             sortedCategories.forEach(category => {
                 const header = document.createElement('h3');
@@ -202,10 +153,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         }
 
-        // Setup download button – create a Word document (.doc) with the responses and grouped prompts
         const downloadBtn = document.getElementById('downloadBtn');
         downloadBtn.onclick = () => {
-            // Build the HTML body content for the Word document
             let bodyHtml = '';
             bodyHtml += `<p><strong>Name:</strong> ${name || ''}</p>`;
             bodyHtml += `<p><strong>Email:</strong> ${email || ''}</p>`;
@@ -220,20 +169,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                 Object.keys(grouped).sort().forEach(category => {
                     bodyHtml += `<h3>${category}</h3>`;
                     bodyHtml += '<ul>';
-                        Array.from(grouped[category]).sort().forEach(promptText => {
-                        // Escape HTML so placeholders like <Company> aren't removed
+                    Array.from(grouped[category]).sort().forEach(promptText => {
                         bodyHtml += `<li>${escapeHtml(promptText)}</li>`;
                     });
                     bodyHtml += '</ul>';
                 });
             }
-            // Word document preamble for Office compatibility
+
             const preHtml = "<html xmlns:o='urn:schemas-microsoft-com:office:office' " +
                 "xmlns:w='urn:schemas-microsoft-com:office:word' " +
                 "xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Recommended Prompts</title></head><body>";
             const postHtml = "</body></html>";
             const html = preHtml + bodyHtml + postHtml;
-            // Create a blob with the Word MIME type
             const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
@@ -245,18 +192,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             document.body.removeChild(link);
             URL.revokeObjectURL(url);
         };
-        // Advance to results step
+
         currentStep = steps.length - 1;
         showStep(currentStep);
     }
 
-    // Event listeners for navigation
     nextBtn.addEventListener('click', () => {
-        // If we are on the last question step, process and show results
         if (currentStep === steps.length - 2) {
             processForm();
         } else {
-            // Validate current step fields if there are any required ones
             const currentFields =
                 steps[currentStep].querySelectorAll('input[required], textarea[required]');
             let valid = true;
@@ -266,7 +210,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             });
             if (!valid) {
-                // Show native validation message
                 currentFields[0].reportValidity();
                 return;
             }
@@ -282,7 +225,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // Fetch prompts.json file synchronously at startup to ensure data is available when the user submits
     try {
         const response = await fetch('prompts.json');
         promptsData = await response.json();
@@ -291,6 +233,5 @@ document.addEventListener('DOMContentLoaded', async () => {
         promptsData = [];
     }
 
-    // Initialize first step
     showStep(currentStep);
 });
