@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const body = encodeURIComponent(
                 'AI Familiarity: ' + (familiarity || '') + '\n' +
                 'Selected Tasks: ' + (tasks.join || '') + '\n' +
-                'Favourite Prompts: ' + favorites.trim()
+                'Favorite Prompts: ' + favorites.trim()
             );
             const mailtoUrl = 'mailto:dkrasemann@deloitte.com?subject=' + subject + '&body=' + body;
             window.location.href = mailtoUrl;
