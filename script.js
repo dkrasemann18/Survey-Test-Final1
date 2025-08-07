@@ -88,7 +88,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const subject = encodeURIComponent('Favorite Gen AI Prompts Submission');
             const body = encodeURIComponent(
                 'AI Familiarity: ' + (familiarity || '') + '\n' +
-                'Selected Tasks: ' + (tasks.join || '') + '\n' +
+                'Selected Tasks: ' + (tasks.join(', ') + '\n' +
                 'Favorite Prompts: ' + favorites.trim()
             );
             const mailtoUrl = 'mailto:dkrasemann@deloitte.com?subject=' + subject + '&body=' + body;
