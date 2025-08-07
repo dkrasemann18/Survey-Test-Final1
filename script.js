@@ -87,9 +87,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (favorites && favorites.trim() !== '') {
             const subject = encodeURIComponent('Favorite Gen AI Prompt Submission');
             const body = encodeURIComponent(
-                'Name: ' + (name || '') + '\n' +
-                'Email: ' + (email || '') + '\n' +
-                'Favourite Prompt: ' + favorites.trim()
+                'AI Familiarity: ' + (familiarity || '') + '\n' +
+                'Selected Tasks: ' + (tasks.join || '') + '\n' +
+                'Favourite Prompts: ' + favorites.trim()
             );
             const mailtoUrl = 'mailto:dkrasemann@deloitte.com?subject=' + subject + '&body=' + body;
             window.location.href = mailtoUrl;
