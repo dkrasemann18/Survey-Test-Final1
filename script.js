@@ -87,6 +87,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (favorites && favorites.trim() !== '') {
             const subject = encodeURIComponent('Favorite Gen AI Prompts Submission');
             const body = encodeURIComponent(
+                'Level: ' + (level || '') + '\n' +
                 'AI Familiarity: ' + (familiarity || '') + '\n' +
                 'Selected Tasks: ' + tasks.join(', ') + '\n' +
                 'Favorite Prompts: ' + favorites.trim()
