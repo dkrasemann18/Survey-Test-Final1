@@ -223,23 +223,3 @@ body {
 #results-container ul {
     margin-bottom: 1rem;
 }
-
-/* Checkbox alignment fix for multi-line options */
-.options label {
-    display: inline-flex;
-    align-items: flex-start;
-    justify-content: flex-start;
-    gap: 0.5rem;
-    width: auto;
-    text-align: left;
-}
-.options label input[type="checkbox"],
-.options label input[type="radio"] {
-    margin: 0;
-    margin-top: 2px;
-}
-.options label span {
-    display: inline-block;
-    white-space: normal;
-    max-width: 100%;
-}
