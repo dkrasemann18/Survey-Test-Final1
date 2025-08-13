@@ -223,3 +223,25 @@ body {
 #results-container ul {
     margin-bottom: 1rem;
 }
+
+/* ================================
+   Tool checkbox alignment fix
+   ================================ */
+.options,
+.options.multi {
+    align-items: flex-start;          /* keep the stack left-aligned */
+}
+
+.options label {
+    display: inline-flex;             /* compact inline layout */
+    align-items: center;
+    justify-content: flex-start;      /* no space-between */
+    gap: 0.5rem;
+    width: auto;                      /* do not stretch full width */
+    text-align: left;
+}
+
+.options input[type="checkbox"],
+.options input[type="radio"] {
+    margin: 0;
+}
