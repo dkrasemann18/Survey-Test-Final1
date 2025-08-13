@@ -224,24 +224,22 @@ body {
     margin-bottom: 1rem;
 }
 
-/* ================================
-   Tool checkbox alignment fix
-   ================================ */
-.options,
-.options.multi {
-    align-items: flex-start;          /* keep the stack left-aligned */
-}
-
+/* Checkbox alignment fix for multi-line options */
 .options label {
-    display: inline-flex;             /* compact inline layout */
-    align-items: center;
-    justify-content: flex-start;      /* no space-between */
+    display: inline-flex;
+    align-items: flex-start;
+    justify-content: flex-start;
     gap: 0.5rem;
-    width: auto;                      /* do not stretch full width */
+    width: auto;
     text-align: left;
 }
-
-.options input[type="checkbox"],
-.options input[type="radio"] {
+.options label input[type="checkbox"],
+.options label input[type="radio"] {
     margin: 0;
+    margin-top: 2px;
+}
+.options label span {
+    display: inline-block;
+    white-space: normal;
+    max-width: 100%;
 }
