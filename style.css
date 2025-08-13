@@ -201,11 +201,7 @@ body {
     margin: 1rem 0;
 }
 
-/* Cover image styling for cover page
- * Use a pseudo-element to insert the image above the heading on the cover page.
- * This avoids having to modify the HTML directly and still displays the
- * uploaded cover image prominently. Adjust the height and max-width
- * values as needed for the image's aspect ratio. */
+/* Cover image styling for cover page */
 .cover-page::before {
     content: "";
     display: block;
@@ -226,4 +222,26 @@ body {
 
 #results-container ul {
     margin-bottom: 1rem;
+}
+
+/* ================================
+   Tool checkbox alignment fix
+   ================================ */
+.options,
+.options.multi {
+    align-items: flex-start;          /* keep the stack left-aligned */
+}
+
+.options label {
+    display: inline-flex;             /* compact inline layout */
+    align-items: center;
+    justify-content: flex-start;      /* no space-between */
+    gap: 0.5rem;
+    width: auto;                      /* do not stretch full width */
+    text-align: left;
+}
+
+.options input[type="checkbox"],
+.options input[type="radio"] {
+    margin: 0;
 }
