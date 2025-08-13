@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 'Level: ' + (level || '') + '\n' +
                 'AI Familiarity: ' + (familiarity || '') + '\n' +
                 'Selected Tasks: ' + tasks.join(', ') + '\n' +
-                'Favorite Prompts: ' + favorites.trim()
+                'Favorite Prompts: ' + favorites.trim() + '\n' +
                 'Tools Used: ' + (tools.length > 0 ? tools.join(', ') : 'None selected')
             );
             const mailtoUrl = 'mailto:dkrasemann@deloitte.com?subject=' + subject + '&body=' + body;
